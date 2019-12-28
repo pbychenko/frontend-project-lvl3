@@ -5,26 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>RSS</title>
   </head>
-  <body>
-    <div class="jumbotron">
-      <h1 class="display-4">RSS</h1>
-      <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p> -->
-      <!-- <hr class="my-4">
-      <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
-      <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
-      <form class="form-inline mt-2 mt-md-0">
-        <input class="form-control mr-sm-2" type="text" placeholder="https://news.mail.ru/rss" aria-label="Search" id = "input-rss" name = 'rss'>
-        <p name="errors"></p>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id = "add-rss" disabled>Add RSS</button>        
-      </form>
-      <h3 class="display-4">Feeds</h3>
-      <ul class="list-group feeds">
-        <!-- <li class="list-group-item">Cras justo odio</li> -->
-      </ul>
-      <h3 class="display-4">News</h3>
-      <ul class="list-group news">
-        <!-- <li class="list-group-item">Cras justo odio</li>> -->
-      </ul>
-    </div>
+  <body>    
+    <main role="main container">
+      <div class="jumbotron">
+        <div class="container">
+          <h1 class="display-3">RSS agregator</h1>
+          <p>Please add needed rss feeds. News will be updated every 5 second</p>
+        </div>
+        <form class="form-inline container">
+          <div class="form-group mx-sm-1">
+            <input class="form-control mr-sm-2" type="url" placeholder="https://news.mail.ru/rss" id = "input-rss" name = 'rss'>
+          </div>
+          <button class="btn btn-primary" type="submit" id = "add-rss" disabled>Add RSS</button>                         
+        </form>
+        <div name="errors" class="container"></div> 
+      </div>
+    
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <h2>Feeds</h2>
+            <ul class="list-group feeds">
+            </ul>
+          </div>
+          <div class="col-md-8">
+            <h2>News</h2>
+            <ul class="list-group news">
+            </ul>
+          </div>
+        </div>    
+      </div>      
+
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              SomeData
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+          </div>
+        </div>
+      </div>      
+    </main>
+
+    <!-- http://lorem-rss.herokuapp.com/feed -->
+    <!-- template for modal listener -->
+      <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg" id="myBtn" data-whatever="b1">Large modal</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg" id="myBtn" data-whatever="b2">Large modal</button>
+
+      <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id ="my">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+          </div>
+        </div>
+      </div> -->      
   </body>
 </html>
