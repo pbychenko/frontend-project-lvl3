@@ -1,4 +1,4 @@
-import addModalButton from './utils';
+import { addModalButton } from './utils';
 
 export const renderErrors = (error) => {
   return error ? `<div class="alert alert-primary" role="alert">${error}</div>` : '';
