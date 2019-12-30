@@ -1,5 +1,3 @@
-import { addModalButton } from './utils';
-
 export const renderErrors = (error) => {
   return error ? `<div class="alert alert-primary" role="alert">${error}</div>` : '';
 };
@@ -7,50 +5,29 @@ export const renderErrors = (error) => {
 const renderNews = (item) => {
   return `<li class="list-group-item">
     <a href="${item.link}">${item.title}</a>
-    <div>${addModalButton(item.description)}</div>
+    <div><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="${item.description}">Show News</button></div>
   </li>`;
 };
 
 const renderFeed = (feed) => {
   return `<li class="list-group-item">
-    <a href="${feed.data.link}">${feed.data.title}</a>
-    <p>${feed.data.description}</p>
+    <a href="${feed.link}">${feed.title}</a>
+    <p>${feed.description}</p>
   </li>`;
 };
 
-export const render = (feeds) => {
-  const feedList = document.querySelector('.feeds');
+export const renderAllNews = (feeds, news) => {
   const newsList = document.querySelector('.news');
-  feedList.innerHTML = feeds.map(renderFeed).join('');
-  newsList.innerHTML = feeds.map((feed) => feed.data.items.map(renderNews).join('')).join('');
+  newsList.innerHTML = feeds.map((feed) => {
+    const feedNews = news.filter((e) => e.url === feed.url);
+    return feedNews.map(renderNews).join('');
+  }).join('');
 };
 
-// const feedli = document.createElement('li');
-// const feeda1 = document.createElement('a');
-// const feedp2 = document.createElement('p');
-
-// feedli.classList.add('list-group-item');
-// feeda1.textContent = feed.data.title;
-// feeda1.href = feed.data.link;
-
-// feedp2.textContent = feed.data.description;
-// feedli.append(feeda1);
-// feedli.append(feedp2);
-// feedList.append(feedli);
-
-// feed.data.items.forEach((item) => {
-//   const newli = document.createElement('li');
-//   const newa1 = document.createElement('a');
-//   const newp2 = document.createElement('p');
-//   const newdiv = document.createElement('div');
-
-//   newli.classList.add('list-group-item');
-//   newa1.textContent = item.title;
-//   newa1.href = item.link;
-//   newdiv.innerHTML = addModal(item.description);
-
-
-//   newli.append(newa1);
-//   newli.append(newp2);
-//   newli.append(newdiv);
-//   newsList.append(newli);
+export const renderFeeds = (feeds, news) => {
+  const input = document.querySelector('#input-rss');
+  const feedList = document.querySelector('.feeds');
+  input.value = '';
+  feedList.innerHTML = feeds.map(renderFeed).join('');
+  renderAllNews(feeds, news);
+};

@@ -2,105 +2,105 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import $ from 'jquery';
 import isURL from 'validator/lib/isURL';
-import { watch } from 'melanke-watchjs';
 import axios from 'axios';
-import parse from './parser';
-import validate from './validator';
-import { renderErrors, render } from './renders';
-import { getDiff } from './utils';
+import { getFeedData, getNewsData, getDomDoc } from './parsers';
+import getDiff from './utils';
+import watchers from './watchers';
 
 const app = () => {
   const state = {
-    addUrlProcess: {
+    addNewFeed: {
+      state: '', //filling, processing, processed, failed
       error: '',
       submitDisabled: true,
     },
     feeds: [],
+    news: [],
+    updateFeedsNews: {
+      state: '', //waiting, inProgress, success, fail
+      errors: [],
+    },
   };
 
-  const input = document.querySelector('#input-rss');
-  const button = document.querySelector('#add-rss');
   const form = document.querySelector('form');
-  const errorBlock = document.querySelector('[name="errors"]');
   const delay = 5000;
   const proxy = 'https://cors-anywhere.herokuapp.com/';
 
-  watch(state, 'addUrlProcess', () => {
-    button.disabled = state.addUrlProcess.submitDisabled;
-    errorBlock.innerHTML = renderErrors(state.addUrlProcess.error);
-  });
+  watchers(state);
 
-  watch(state, 'feeds', () => {
-    // const feed = state.feeds[state.feeds.length - 1];
-    // render(feed);
-    render(state.feeds);
-  });
-
-  form.elements.rss.addEventListener('keyup', () => {
+  form.elements.rss.addEventListener('keyup', (event) => {
     const feedsUrls = state.feeds.map((e) => e.url);
-    state.addUrlProcess.error = '';
-    if (input.value === '') {
-      state.addUrlProcess.submitDisabled = true;
-      state.addUrlProcess.error = 'Field is empty, please enter rss url';
-    } else if (!isURL(input.value)) {
-      state.addUrlProcess.submitDisabled = true;
-      state.addUrlProcess.error = 'Incorrect url';
-    } else if (feedsUrls.includes(input.value)) {
-      state.addUrlProcess.submitDisabled = true;
-      state.addUrlProcess.error = 'This url has been already added';
+    state.addNewFeed.error = '';
+    const { value } = event.target;
+
+    if (state.addNewFeed.state === 'processing') {
+      state.addNewFeed.submitDisabled = true;
+    } else if (value === '') {
+      state.addNewFeed.state = 'filling';
+      state.addNewFeed.submitDisabled = true;
+    } else if (!isURL(value)) {
+      state.addNewFeed.submitDisabled = true;
+      state.addNewFeed.state = 'filling';
+      state.addNewFeed.error = 'Incorrect url';
+    } else if (feedsUrls.includes(value)) {
+      state.addNewFeed.state = 'filling';
+      state.addNewFeed.submitDisabled = true;
+      state.addNewFeed.error = 'This url has been already added';
     } else {
-      state.addUrlProcess.submitDisabled = false;
-      state.addUrlProcess.error = '';
+      state.addNewFeed.state = 'filling';
+      state.addNewFeed.submitDisabled = false;
+      state.addNewFeed.error = '';
     }
   });
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    // const formData = new FormData(e.target);
-    const url = input.value;
-    // const proxy = 'https://cors-anywhere.herokuapp.com/';
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const url = formData.get('rss');
+    state.addNewFeed.state = 'processing';
+    state.addNewFeed.submitDisabled = true;
+
     axios.get(proxy + url)
       .then((response) => {
-        const xmlObj = parse(response.data);
-        const data = validate(xmlObj);
-        // console.log(data.items);
-        state.feeds.push({ url, data });
+        const xmlObj = getDomDoc(response.data);
+        const feed = getFeedData(url, xmlObj);
+        const news = getNewsData(url, xmlObj);
+        state.addNewFeed.state = 'processed';
+        state.feeds.unshift(feed);
+        state.news.unshift(...news);
       })
       .catch((error) => {
         console.log(error);
-        state.addUrlProcess.error = 'Somethnig wrong with network, please try to repeate later';
+        state.addNewFeed.error = 'Somethnig wrong with network or this url is\'nt RSS url. Please check and try to repeate later';
+        state.addNewFeed.state = 'failed';
       });
-    input.value = '';
   });
 
-  const updateNews = () => {
-    const urls = state.feeds.map((e, i) => ({ url: e.url, index: i }));
-    // console.log(urls);
-    urls.forEach((url) => {
-      axios.get(proxy + url.url)
+  const updateAllNews = () => {
+    const urls = state.feeds.map((e) => e.url);
+
+    const updateUrlNews = (url) => {
+      return axios.get(proxy + url)
         .then((response) => {
-          const xmlObj = parse(response.data);
-          const newData = validate(xmlObj).items;
-          console.log(newData);
-          const oldData = state.feeds[url.index].data.items;
-          // console.log(oldData);
-          // console.log(getDiff(newData, oldData));
-          const diff = getDiff(newData, oldData);
+          const xmlObj = getDomDoc(response.data);
+          const newNewsUrlData = getNewsData(url, xmlObj);
+          const oldNewsData = state.news.filter((e) => e.url === url);
+          const diff = getDiff(newNewsUrlData, oldNewsData);
           console.log(diff);
           if (diff.length > 0) {
-            // console.log(state.feeds[url.index].data.items);
-            state.feeds[url.index].data.items.push(...diff);
+            state.news.unshift(...diff);
           }
-        })
-        .catch((error) => {
-          console.log(error);
-          state.addUrlProcess.error = 'Somethnig wrong with network, please try to repeate later';
         });
-    });
-    setTimeout(updateNews, delay);
+    };
+    const promises = urls.map((url) => updateUrlNews(url).catch((error) => {
+      console.log(error);
+      state.addNewFeed.error = 'Somethnig wrong with network';
+    }));
+    Promise.all(promises);
+    setTimeout(updateAllNews, delay);
   };
 
-  setTimeout(updateNews, delay);
+  setTimeout(updateAllNews, delay);
 
   $('#exampleModal').on('show.bs.modal', function (event) {
     const modalButton = $(event.relatedTarget);
