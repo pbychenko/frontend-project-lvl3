@@ -3,21 +3,24 @@ export const getFeedData = (url, xmlObject) => {
   if (errorElement) {
     throw new Error('It is\'nt RSS url');
   } else {
-    const title = xmlObject.querySelector('title').textContent;
-    const link = xmlObject.querySelector('link').textContent;
-    const description = xmlObject.querySelector('description').textContent;
-    return { url, title, link, description };
+    return {
+      url,
+      title: xmlObject.querySelector('title').textContent,
+      link: xmlObject.querySelector('link').textContent,
+      description: xmlObject.querySelector('description').textContent,
+    };
   }
 };
 
 export const getNewsData = (url, xmlObject) => {
   const items = [...xmlObject.querySelectorAll('item')];
-  const newsData = items.map((el) => {
-    const description = el.querySelector('description').textContent;
-    const title = el.querySelector('title').textContent;
-    const link = el.querySelector('link').textContent;
-    return { url, title, description, link };
-  });
+  const newsData = items.map((el) => (
+    {
+      url,
+      title: el.querySelector('title').textContent,
+      description: el.querySelector('description').textContent,
+      link: el.querySelector('link').textContent,
+    }));
 
   return newsData;
 };

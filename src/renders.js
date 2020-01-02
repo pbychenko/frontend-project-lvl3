@@ -1,20 +1,17 @@
-export const renderErrors = (error) => {
-  return error ? `<div class="alert alert-primary" role="alert">${error}</div>` : '';
-};
+export const renderNotification = (notification) => (
+  notification ? `<div class="alert alert-primary" role="alert">${notification}</div>` : '');
 
-const renderNews = (item) => {
-  return `<li class="list-group-item">
+const renderNews = (item) => (
+  `<li class="list-group-item">
     <a href="${item.link}">${item.title}</a>
     <div><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="${item.description}">Show News</button></div>
-  </li>`;
-};
+  </li>`);
 
-const renderFeed = (feed) => {
-  return `<li class="list-group-item">
+const renderFeed = (feed) => (
+  `<li class="list-group-item">
     <a href="${feed.link}">${feed.title}</a>
     <p>${feed.description}</p>
-  </li>`;
-};
+  </li>`);
 
 export const renderAllNews = (feeds, news) => {
   const newsList = document.querySelector('.news');
@@ -25,9 +22,7 @@ export const renderAllNews = (feeds, news) => {
 };
 
 export const renderFeeds = (feeds, news) => {
-  const input = document.querySelector('#input-rss');
   const feedList = document.querySelector('.feeds');
-  input.value = '';
   feedList.innerHTML = feeds.map(renderFeed).join('');
   renderAllNews(feeds, news);
 };
