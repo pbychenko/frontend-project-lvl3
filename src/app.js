@@ -57,6 +57,7 @@ const app = () => {
   form.addEventListener('submit', submitHandler);
   updateAllNewsPeriodically(state);
 
+  // eslint-disable-next-line func-names
   $('#exampleModal').on('show.bs.modal', function (event) {
     const modalButton = $(event.relatedTarget);
     const recipient = modalButton.data('whatever');
