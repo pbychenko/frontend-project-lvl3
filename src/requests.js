@@ -31,7 +31,7 @@ export const updateAllNewsPeriodically = (globalState) => {
     state.updateFeedsNews.state = 'waiting';
     const urls = state.feeds.map((e) => e.url);
 
-    const updateUrlNews = (url) => (
+    const updateFeedNewsByUrl = (url) => (
       axios.get(proxy + url)
         .then((response) => {
           state.updateFeedsNews.state = 'processing';
@@ -44,13 +44,15 @@ export const updateAllNewsPeriodically = (globalState) => {
             state.news.unshift(...diff);
           }
         })
+        .catch((error) => {
+          console.log(error);
+          state.updateFeedsNews.state = 'fail';
+          state.userNotification = 'Somethnig wrong with network';
+        })
     );
 
-    const promises = urls.map((url) => updateUrlNews(url).catch((error) => {
-      console.log(error);
-      state.updateFeedsNews.state = 'fail';
-      state.userNotification = 'Somethnig wrong with network';
-    }));
+    const promises = urls.map((url) => updateFeedNewsByUrl(url));
+
     Promise.all(promises);
     setTimeout(updateAllNews, delay);
   };
