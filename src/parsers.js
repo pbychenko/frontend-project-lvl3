@@ -1,19 +1,5 @@
-export const getFeedData = (url, xmlObject) => {
-  const errorElement = xmlObject.querySelector('parsererror');
-  if (errorElement) {
-    throw new Error('It is\'nt RSS url');
-  } else {
-    return {
-      url,
-      title: xmlObject.querySelector('title').textContent,
-      link: xmlObject.querySelector('link').textContent,
-      description: xmlObject.querySelector('description').textContent,
-    };
-  }
-};
-
-export const getNewsData = (url, xmlObject) => {
-  const items = [...xmlObject.querySelectorAll('item')];
+const parseNews = (url, doc) => {
+  const items = [...doc.querySelectorAll('item')];
   const newsData = items.map((el) => (
     {
       url,
@@ -25,8 +11,23 @@ export const getNewsData = (url, xmlObject) => {
   return newsData;
 };
 
-export const getDomDoc = (data) => {
+const parse = (url, data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
-  return doc;
+  const errorElement = doc.querySelector('parsererror');
+
+  if (errorElement) {
+    throw new Error('It isn\'t RSS url');
+  } else {
+    const feed = {
+      url,
+      title: doc.querySelector('title').textContent,
+      link: doc.querySelector('link').textContent,
+      description: doc.querySelector('description').textContent,
+    };
+
+    return { feed, news: parseNews(url, doc) };
+  }
 };
+
+export default parse;
