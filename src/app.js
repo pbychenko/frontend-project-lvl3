@@ -2,14 +2,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import $ from 'jquery';
 import isURL from 'validator/lib/isURL';
-import watchers from './watchers';
+import watchGlobalState from './watchers';
 import { addFeed, updateAllNewsPeriodically } from './requests';
+import translate from './localization';
 
 const app = () => {
   const state = {
     addNewFeed: {
       state: '',
-      submitDisabled: true,
+      validationState: 'invalid',
     },
     userNotification: '',
     feeds: [],
@@ -21,7 +22,16 @@ const app = () => {
 
   const form = document.querySelector('form');
 
-  watchers(state);
+//   function wait(ms){
+//     var start = new Date().getTime();
+//     var end = start;
+//     while(end < start + ms) {
+//       end = new Date().getTime();
+//    }
+//  };
+
+  watchGlobalState(state);
+  console.log(translate('key'));
 
   const inputHandler = (event) => {
     const { value } = event.target;
@@ -29,16 +39,16 @@ const app = () => {
 
     state.addNewFeed.state = 'filling';
     if (value === '') {
-      state.addNewFeed.submitDisabled = true;
+      state.addNewFeed.validationState = 'invalid';
       state.userNotification = 'Field shouldn\'t be empty';
     } else if (!isURL(value)) {
-      state.addNewFeed.submitDisabled = true;
+      state.addNewFeed.validationState = 'invalid';
       state.userNotification = 'Incorrect url';
     } else if (feedsUrls.includes(value)) {
-      state.addNewFeed.submitDisabled = true;
+      state.addNewFeed.validationState = 'invalid';
       state.userNotification = 'This url has been already added';
     } else {
-      state.addNewFeed.submitDisabled = false;
+      state.addNewFeed.validationState = 'valid';
       state.userNotification = '';
     }
   };
@@ -49,7 +59,7 @@ const app = () => {
     const url = formData.get('input');
     state.addNewFeed.state = 'processing';
     state.userNotification = 'Please wait';
-    state.addNewFeed.submitDisabled = true;
+    state.addNewFeed.validationState = 'invalid';
     addFeed(state, url);
   };
 

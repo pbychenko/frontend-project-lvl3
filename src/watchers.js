@@ -1,13 +1,13 @@
 import { watch } from 'melanke-watchjs';
 import { renderNotification, renderFeeds, renderAllNews } from './renders';
 
-const watchers = (state) => {
+const watchGlobalState = (state) => {
   const input = document.querySelector('#input-rss');
   const button = document.querySelector('#add-rss');
   const errorBlock = document.querySelector('[name="errors"]');
 
   watch(state, 'addNewFeed', () => {
-    button.disabled = state.addNewFeed.submitDisabled;
+    button.disabled = state.addNewFeed.validationState === 'invalid';
     switch (state.addNewFeed.state) {
       case 'filling':
         break;
@@ -48,4 +48,4 @@ const watchers = (state) => {
   });
 };
 
-export default watchers;
+export default watchGlobalState;
