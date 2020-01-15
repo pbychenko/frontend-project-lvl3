@@ -1,6 +1,10 @@
 const en = {
   translation: {
-    key: 'Привет мир!',
+    validationUrlNotifications: {
+      emptyField: 'Field shouldn\'t be empty',
+      incorrectUrl: 'Incorrect url',
+      dublicateUrl: 'This url has been already added',
+    },
   },
 };
 

@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 import $ from 'jquery';
 import isURL from 'validator/lib/isURL';
 import watchGlobalState from './watchers';
-import { addFeed, updateAllNewsPeriodically } from './requests';
+import { addFeed, updateNews } from './requests';
 import translate from './localization';
 
 const app = () => {
@@ -22,16 +22,7 @@ const app = () => {
 
   const form = document.querySelector('form');
 
-//   function wait(ms){
-//     var start = new Date().getTime();
-//     var end = start;
-//     while(end < start + ms) {
-//       end = new Date().getTime();
-//    }
-//  };
-
   watchGlobalState(state);
-  console.log(translate('key'));
 
   const inputHandler = (event) => {
     const { value } = event.target;
@@ -40,13 +31,19 @@ const app = () => {
     state.addNewFeed.state = 'filling';
     if (value === '') {
       state.addNewFeed.validationState = 'invalid';
-      state.userNotification = 'Field shouldn\'t be empty';
+      translate((t) => {
+        state.userNotification = t('validationUrlNotifications.emptyField');
+      });
     } else if (!isURL(value)) {
       state.addNewFeed.validationState = 'invalid';
-      state.userNotification = 'Incorrect url';
+      translate((t) => {
+        state.userNotification = t('validationUrlNotifications.incorrectUrl');
+      });
     } else if (feedsUrls.includes(value)) {
       state.addNewFeed.validationState = 'invalid';
-      state.userNotification = 'This url has been already added';
+      translate((t) => {
+        state.userNotification = t('validationUrlNotifications.dublicateUrl');
+      });
     } else {
       state.addNewFeed.validationState = 'valid';
       state.userNotification = '';
@@ -65,7 +62,7 @@ const app = () => {
 
   form.elements.input.addEventListener('input', inputHandler);
   form.addEventListener('submit', submitHandler);
-  updateAllNewsPeriodically(state);
+  updateNews(state);
 
   // eslint-disable-next-line func-names
   $('#exampleModal').on('show.bs.modal', function (event) {
