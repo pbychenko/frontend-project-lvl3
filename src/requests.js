@@ -1,20 +1,17 @@
+import _ from 'lodash';
 import axios from 'axios';
 import parse from './parsers';
 
 const proxy = 'https://cors-anywhere.herokuapp.com/';
 
-const getDiff = (data1, data2) => {
-  const data2Titles = data2.map((el) => el.title);
-  return data1.filter((el) => !data2Titles.includes(el.title));
-};
-
 export const addFeed = (globalState, url) => {
   const state = globalState;
   axios.get(proxy + url)
     .then(({ data }) => {
-      const { feed, news } = parse(url, data);
+      const { feed, news } = parse(data);
       state.feeds.unshift(feed);
       state.news.unshift(...news);
+      state.urls.push(url);
       state.addNewFeed.state = 'success';
       state.userNotification = '';
     })
@@ -33,9 +30,9 @@ export const updateNews = (globalState) => {
     axios.get(proxy + url)
       .then(({ data }) => {
         state.updateFeedsNews.state = 'processing';
-        const { news } = parse(url, data);
-        const oldNews = state.news.filter((e) => e.url === url);
-        const diff = getDiff(news, oldNews);
+        const { feed, news } = parse(data);
+        const oldNews = state.news.filter((e) => e.feedLink === feed.link);
+        const diff = _.differenceWith(news, oldNews, _.isEqual);
         if (diff.length > 0) {
           state.news.unshift(...diff);
         }
@@ -49,7 +46,6 @@ export const updateNews = (globalState) => {
   );
 
   state.updateFeedsNews.state = 'waiting';
-  const urls = state.feeds.map((e) => e.url);
-  const promises = urls.map((url) => updateFeedNewsByUrl(url));
+  const promises = state.urls.map((url) => updateFeedNewsByUrl(url));
   Promise.all(promises).finally(() => setTimeout(() => updateNews(state), delay));
 };

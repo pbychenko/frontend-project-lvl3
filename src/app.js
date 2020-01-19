@@ -15,6 +15,7 @@ const app = () => {
     userNotification: '',
     feeds: [],
     news: [],
+    urls: [],
     updateFeedsNews: {
       state: '',
     },
@@ -26,7 +27,6 @@ const app = () => {
 
   const inputHandler = (event) => {
     const { value } = event.target;
-    const feedsUrls = state.feeds.map((e) => e.url);
 
     state.addNewFeed.state = 'filling';
     if (value === '') {
@@ -39,7 +39,7 @@ const app = () => {
       translate((t) => {
         state.userNotification = t('validationUrlNotifications.incorrectUrl');
       });
-    } else if (feedsUrls.includes(value)) {
+    } else if (state.urls.includes(value)) {
       state.addNewFeed.validationState = 'invalid';
       translate((t) => {
         state.userNotification = t('validationUrlNotifications.dublicateUrl');

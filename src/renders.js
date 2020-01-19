@@ -16,7 +16,7 @@ const renderFeed = (feed) => (
 export const renderAllNews = (feeds, news) => {
   const newsList = document.querySelector('.news');
   newsList.innerHTML = feeds.map((feed) => {
-    const feedNews = news.filter((e) => e.url === feed.url);
+    const feedNews = news.filter((e) => e.feedLink === feed.link);
     return feedNews.map(renderNews).join('');
   }).join('');
 };

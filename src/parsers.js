@@ -1,8 +1,9 @@
-const parseNews = (url, doc) => {
+const parseNews = (doc) => {
   const items = [...doc.querySelectorAll('item')];
+  const feedLink = doc.querySelector('link').textContent;
   const newsData = items.map((el) => (
     {
-      url,
+      feedLink,
       title: el.querySelector('title').textContent,
       description: el.querySelector('description').textContent,
       link: el.querySelector('link').textContent,
@@ -11,7 +12,7 @@ const parseNews = (url, doc) => {
   return newsData;
 };
 
-const parse = (url, data) => {
+const parse = (data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
   const errorElement = doc.querySelector('parsererror');
@@ -20,13 +21,12 @@ const parse = (url, data) => {
     throw new Error('It isn\'t RSS url');
   } else {
     const feed = {
-      url,
       title: doc.querySelector('title').textContent,
       link: doc.querySelector('link').textContent,
       description: doc.querySelector('description').textContent,
     };
 
-    return { feed, news: parseNews(url, doc) };
+    return { feed, news: parseNews(doc) };
   }
 };
 
