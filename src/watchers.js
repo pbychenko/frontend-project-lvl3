@@ -1,5 +1,5 @@
 import { watch } from 'melanke-watchjs';
-import { renderNotification, renderFeeds, renderAllNews } from './renders';
+import { renderNotification, renderFeeds, renderAllItems } from './renders';
 
 const watchGlobalState = (state) => {
   const input = document.querySelector('#input-rss');
@@ -17,7 +17,7 @@ const watchGlobalState = (state) => {
         break;
       case 'success':
         input.disabled = false;
-        renderFeeds(state.feeds, state.news);
+        renderFeeds(state.feeds, state.items);
         break;
       case 'fail':
         input.disabled = false;
@@ -27,19 +27,19 @@ const watchGlobalState = (state) => {
     }
   });
 
-  watch(state, 'updateFeedsNews', () => {
-    switch (state.updateFeedsNews.state) {
+  watch(state, 'updateFeedsItems', () => {
+    switch (state.updateFeedsItems.state) {
       case 'waiting':
         break;
       case 'processing':
         break;
       case 'success':
-        renderAllNews(state.feeds, state.news);
+        renderAllItems(state.feeds, state.items);
         break;
       case 'fail':
         break;
       default:
-        throw Error('incorrect updateFeedsNews state occurs!');
+        throw Error('incorrect updateFeedsItems state occurs!');
     }
   });
 

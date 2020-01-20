@@ -1,7 +1,7 @@
-const parseNews = (doc) => {
+const parseItems = (doc) => {
   const items = [...doc.querySelectorAll('item')];
   const feedLink = doc.querySelector('link').textContent;
-  const newsData = items.map((el) => (
+  const itemsData = items.map((el) => (
     {
       feedLink,
       title: el.querySelector('title').textContent,
@@ -9,7 +9,7 @@ const parseNews = (doc) => {
       link: el.querySelector('link').textContent,
     }));
 
-  return newsData;
+  return itemsData;
 };
 
 const parse = (data) => {
@@ -26,7 +26,7 @@ const parse = (data) => {
       description: doc.querySelector('description').textContent,
     };
 
-    return { feed, news: parseNews(doc) };
+    return { feed, items: parseItems(doc) };
   }
 };
 

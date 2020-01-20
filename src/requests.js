@@ -8,9 +8,9 @@ export const addFeed = (globalState, url) => {
   const state = globalState;
   axios.get(proxy + url)
     .then(({ data }) => {
-      const { feed, news } = parse(data);
+      const { feed, items } = parse(data);
       state.feeds.unshift(feed);
-      state.news.unshift(...news);
+      state.items.unshift(...items);
       state.urls.push(url);
       state.addNewFeed.state = 'success';
       state.userNotification = '';
@@ -22,30 +22,30 @@ export const addFeed = (globalState, url) => {
     });
 };
 
-export const updateNews = (globalState) => {
+export const updateItems = (globalState) => {
   const state = globalState;
   const delay = 5000;
 
-  const updateFeedNewsByUrl = (url) => (
+  const updateFeedItems = (url) => (
     axios.get(proxy + url)
       .then(({ data }) => {
-        state.updateFeedsNews.state = 'processing';
-        const { feed, news } = parse(data);
-        const oldNews = state.news.filter((e) => e.feedLink === feed.link);
-        const diff = _.differenceWith(news, oldNews, _.isEqual);
+        state.updateFeedsItems.state = 'processing';
+        const { feed, items } = parse(data);
+        const oldItems = state.items.filter((e) => e.feedLink === feed.link);
+        const diff = _.differenceWith(items, oldItems, _.isEqual);
         if (diff.length > 0) {
-          state.news.unshift(...diff);
+          state.items.unshift(...diff);
         }
-        state.updateFeedsNews.state = 'success';
+        state.updateFeedsItems.state = 'success';
       })
       .catch((error) => {
-        state.updateFeedsNews.state = 'fail';
+        state.updateFeedsItems.state = 'fail';
         state.userNotification = error.message;
         throw error;
       })
   );
 
-  state.updateFeedsNews.state = 'waiting';
-  const promises = state.urls.map((url) => updateFeedNewsByUrl(url));
-  Promise.all(promises).finally(() => setTimeout(() => updateNews(state), delay));
+  state.updateFeedsItems.state = 'waiting';
+  const promises = state.urls.map((url) => updateFeedItems(url));
+  Promise.all(promises).finally(() => setTimeout(() => updateItems(state), delay));
 };

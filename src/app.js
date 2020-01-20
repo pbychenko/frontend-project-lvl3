@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 import $ from 'jquery';
 import isURL from 'validator/lib/isURL';
 import watchGlobalState from './watchers';
-import { addFeed, updateNews } from './requests';
+import { addFeed, updateItems } from './requests';
 import translate from './localization';
 
 const app = () => {
@@ -14,9 +14,9 @@ const app = () => {
     },
     userNotification: '',
     feeds: [],
-    news: [],
+    items: [],
     urls: [],
-    updateFeedsNews: {
+    updateFeedsItems: {
       state: '',
     },
   };
@@ -62,7 +62,7 @@ const app = () => {
 
   form.elements.input.addEventListener('input', inputHandler);
   form.addEventListener('submit', submitHandler);
-  updateNews(state);
+  updateItems(state);
 
   // eslint-disable-next-line func-names
   $('#exampleModal').on('show.bs.modal', function (event) {
